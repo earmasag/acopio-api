@@ -40,7 +40,11 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    from app.core.config import settings
+    url = settings.DATABASE_URL
+    if url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        
     context.configure(
         url=url,
         target_metadata=target_metadata,
