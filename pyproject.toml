@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "acopio-api"
+version = "0.1.0"
+description = "API for Acopio MVP"
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.23.0",
+    "sqlalchemy>=2.0.0",
+    "asyncpg>=0.28.0",
+    "alembic>=1.11.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "reportlab>=4.0.0",
+    "qrcode>=7.4.2"
+]
