@@ -25,7 +25,8 @@ def generate_qrs_pdf(pages: int = Query(1, ge=1, le=100)):
     rows = 4
     col_width = width / cols
     row_height = height / rows
-    qr_size = 130 # tamaño del QR en puntos
+    qr_size = 200  # QR más grande (era 130)
+    font_size = 7  # UUID más pequeño (era 10)
     
     for _ in range(pages):
         for row in range(rows):
@@ -46,14 +47,14 @@ def generate_qrs_pdf(pages: int = Query(1, ge=1, le=100)):
                 
                 # Centrar QR en la celda
                 x_qr = x_cell + (col_width - qr_size) / 2
-                y_qr = y_cell + (row_height - qr_size) / 2 + 15
+                y_qr = y_cell + (row_height - qr_size) / 2 + 10
                 
                 # Dibujar QR
                 c.drawImage(qr_image, x_qr, y_qr, width=qr_size, height=qr_size)
                 
-                # Dibujar texto del UUID debajo del QR
-                c.setFont("Helvetica", 10)
-                c.drawCentredString(x_cell + col_width / 2, y_qr - 15, qr_id)
+                # Dibujar UUID debajo del QR con fuente pequeña
+                c.setFont("Helvetica", font_size)
+                c.drawCentredString(x_cell + col_width / 2, y_qr - 12, qr_id)
         
         c.showPage()
     
