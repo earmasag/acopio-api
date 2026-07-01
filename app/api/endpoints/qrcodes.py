@@ -22,11 +22,11 @@ def generate_qrs_pdf(pages: int = Query(1, ge=1, le=100)):
     width, height = A4
     
     cols = 2
-    rows = 4
+    rows = 3        # 2 × 3 = 6 QR por página
     col_width = width / cols
     row_height = height / rows
-    qr_size = 200  # QR más grande (era 130)
-    font_size = 7  # UUID más pequeño (era 10)
+    qr_size = 250   # QR más grande gracias al espacio extra
+    font_size = 7   # UUID pequeño
     
     for _ in range(pages):
         for row in range(rows):
