@@ -65,3 +65,19 @@ def generate_qrs_pdf(pages: int = Query(1, ge=1, le=100)):
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=acopio_etiquetas.pdf"}
     )
+
+@router.get("/center/{token_hash}", summary="Generar QR individual")
+def generate_center_qr(token_hash: str):
+    """
+    Genera una imagen PNG con el código QR para un token de centro de acopio específico.
+    Ideal para mostrar en pantalla o imprimir individualmente.
+    """
+    qr = qrcode.make(token_hash)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    buffer.seek(0)
+    
+    return StreamingResponse(
+        buffer,
+        media_type="image/png"
+    )

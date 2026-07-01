@@ -2,8 +2,9 @@ import json
 from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from fastapi import HTTPException
 from app.schemas.sync import SyncPayload, SyncResponse, FailedEventDetail, LogisticaEvent
-from app.models.domain import SyncLog, DeadLetterEvent, Package, PackageItem
+from app.models.domain import SyncLog, DeadLetterEvent, Package, PackageItem, CampToken
 
 class BusinessError(Exception):
     def __init__(self, reason: str):
@@ -21,6 +22,19 @@ async def process_sync(db: AsyncSession, payload: SyncPayload) -> SyncResponse:
             processed=existing_sync.processed_count or 0,
             failed=existing_sync.failed_count or 0,
             failed_events=[]
+        )
+    
+    # 2. Validate Camp Token
+    if not payload.centro_acopio_id:
+        raise HTTPException(status_code=403, detail="Debe proporcionar un token de centro de acopio válido.")
+        
+    result_camp = await db.execute(select(CampToken).where(CampToken.token_hash == payload.centro_acopio_id))
+    camp = result_camp.scalar_one_or_none()
+    
+    if not camp or not camp.is_active:
+        raise HTTPException(
+            status_code=403, 
+            detail=f"El token de centro '{payload.centro_acopio_id}' no es válido o está inactivo. Solicite un QR correcto a su coordinador."
         )
     
     processed_count = 0
