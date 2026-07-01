@@ -63,7 +63,8 @@ class PackageView(ModelView, model=Package):
     icon = "fa-solid fa-box"
 
 class PackageItemView(ModelView, model=PackageItem):
-    column_list = [PackageItem.id, PackageItem.package_uuid, PackageItem.category_id, PackageItem.quantity]
+    column_list = [PackageItem.id, PackageItem.package_uuid, PackageItem.category_id, PackageItem.quantity, PackageItem.barcode, PackageItem.item_name]
+    column_searchable_list = [PackageItem.barcode, PackageItem.item_name]
     name = "Package Item"
     name_plural = "Package Items"
     icon = "fa-solid fa-boxes-stacked"

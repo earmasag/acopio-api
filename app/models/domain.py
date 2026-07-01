@@ -60,6 +60,10 @@ class PackageItem(Base):
     package_uuid = Column(String(36), ForeignKey("package.id_uuid", ondelete="CASCADE"), nullable=False)
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
     quantity = Column(Integer, nullable=False)
+    # barcode: código de barras escaneado (nullable: ítems manuales no lo tienen)
+    barcode = Column(String(50), nullable=True, index=True)
+    # item_name: nombre del producto resuelto por la API de códigos de barras
+    item_name = Column(String(255), nullable=True)
     
     __table_args__ = (
         CheckConstraint('quantity > 0', name='chk_quantity'),

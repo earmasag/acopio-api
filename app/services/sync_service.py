@@ -100,7 +100,10 @@ async def process_sync(db: AsyncSession, payload: SyncPayload) -> SyncResponse:
                     new_item = PackageItem(
                         package_uuid=event.package_uuid,
                         category_id=int(cat_id),
-                        quantity=int(qty)
+                        quantity=int(qty),
+                        # Opcionales: presentes si el ítem fue escaneado (no manual)
+                        barcode=event.payload.get("barcode") or None,
+                        item_name=event.payload.get("item_name") or None,
                     )
                     db.add(new_item)
                     
