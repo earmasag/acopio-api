@@ -4,7 +4,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException
 from app.schemas.sync import SyncPayload, SyncResponse, FailedEventDetail, LogisticaEvent
-from app.models.domain import SyncLog, DeadLetterEvent, Package, PackageItem, CampToken
+from app.models.domain import SyncLog, DeadLetterEvent, Package, PackageItem, CampToken, ClothingItemDetail
+
+# ID de la categoría Ropa en la BD (sembrado en migración a1b2c3d4e5f6)
+CATEGORY_ROPA_ID = 5
 
 class BusinessError(Exception):
     def __init__(self, reason: str):
@@ -100,6 +103,27 @@ async def process_sync(db: AsyncSession, payload: SyncPayload) -> SyncResponse:
                         quantity=int(qty)
                     )
                     db.add(new_item)
+                    
+                    # Si es ropa, necesitamos guardar el tipo de prenda y la talla.
+                    # El frontend debe incluir en el payload:
+                    #   garment_type_id: str  (ej. "pantalon", "calzado")
+                    #   size: str             (ej. "M", "38")
+                    if int(cat_id) == CATEGORY_ROPA_ID:
+                        garment_type_id = event.payload.get("garment_type_id")
+                        size = event.payload.get("size")
+                        if not garment_type_id or not size:
+                            raise BusinessError(
+                                "Para ropa se requieren los campos 'garment_type_id' y 'size' en el payload."
+                            )
+                        # flush para obtener el id autogenerado de new_item antes de relacionarlo
+                        await db.flush()
+                        clothing = ClothingItemDetail(
+                            package_item_id=new_item.id,
+                            garment_type_id=str(garment_type_id),
+                            size=str(size)
+                        )
+                        db.add(clothing)
+                    
                     if current_weight < STATE_WEIGHTS["PACKING"]:
                         package.status = "PACKING"
                     
