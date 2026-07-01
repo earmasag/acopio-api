@@ -72,3 +72,16 @@ class SyncLog(Base):
     event_type = Column(String(50), nullable=False)
     processed_at = Column(DateTime(timezone=True), server_default=func.now())
     result = Column(String(50), nullable=False)
+    centro_acopio_id = Column(String(50), nullable=True)
+    total_events = Column(Integer, nullable=True)
+    processed_count = Column(Integer, nullable=True)
+    failed_count = Column(Integer, nullable=True)
+
+class DeadLetterEvent(Base):
+    __tablename__ = "dead_letter_queue"
+    id = Column(Integer, primary_key=True, index=True)
+    sync_id = Column(String(36), ForeignKey("sync_log.sync_id"), nullable=False)
+    event_id = Column(String(36), nullable=False)
+    event_payload = Column(String, nullable=False)
+    error_reason = Column(String(500), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

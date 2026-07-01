@@ -17,3 +17,6 @@ dependencies = [
     "reportlab>=4.0.0",
     "qrcode>=7.4.2"
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
