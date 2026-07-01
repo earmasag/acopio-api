@@ -16,6 +16,7 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "reportlab>=4.0.0",
     "qrcode>=7.4.2",
+    "wtforms<3.2.0",
     "sqladmin[full]>=0.16.1"
 ]
 
