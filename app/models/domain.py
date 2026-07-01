@@ -114,3 +114,19 @@ class DeadLetterEvent(Base):
     event_payload = Column(String, nullable=False)
     error_reason = Column(String(500), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class Product(Base):
+    """Catálogo local de productos identificados por código de barras.
+    Actúa como caché de consultas a APIs externas (OpenFDA, OpenFoodFacts, UPCItemDB, etc.).
+    La primera vez que un celular escanea un código desconocido, el backend guarda el
+    resultado aquí para que las siguientes consultas del mismo código sean instantáneas.
+    """
+    __tablename__ = "product"
+    barcode = Column(String(50), primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    brand = Column(String(150), nullable=True)
+    category_id = Column(Integer, ForeignKey("category.id"), nullable=True)
+    # Qué API externa identificó este producto (open_fda, upcitemdb_trial, open_food_facts…)
+    source_api = Column(String(50), nullable=True)
+    image_url = Column(String(500), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)

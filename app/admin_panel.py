@@ -2,7 +2,7 @@ from sqladmin import ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from app.core.config import settings
-from app.models.domain import Category, CampToken, Package, PackageItem, Truck, Trip, SyncLog, DeadLetterEvent, GarmentType, ClothingItemDetail
+from app.models.domain import Category, CampToken, Package, PackageItem, Truck, Trip, SyncLog, DeadLetterEvent, GarmentType, ClothingItemDetail, Product
 
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
@@ -82,6 +82,13 @@ class ClothingItemDetailView(ModelView, model=ClothingItemDetail):
     name_plural = "Clothing Details"
     icon = "fa-solid fa-tags"
 
+class ProductView(ModelView, model=Product):
+    column_list = [Product.barcode, Product.name, Product.brand, Product.category_id, Product.source_api, Product.created_at]
+    column_searchable_list = [Product.barcode, Product.name, Product.brand]
+    name = "Product"
+    name_plural = "Products"
+    icon = "fa-solid fa-barcode"
+
 class SyncLogView(ModelView, model=SyncLog):
     column_list = [SyncLog.sync_id, SyncLog.event_type, SyncLog.result, SyncLog.centro_acopio_id, SyncLog.total_events, SyncLog.processed_count, SyncLog.failed_count, SyncLog.processed_at]
     column_searchable_list = [SyncLog.sync_id, SyncLog.centro_acopio_id]
@@ -102,6 +109,7 @@ admin_views = [
     CategoryView,
     GarmentTypeView,
     ClothingItemDetailView,
+    ProductView,
     TruckView,
     TripView,
     PackageView,
