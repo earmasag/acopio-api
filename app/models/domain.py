@@ -28,9 +28,19 @@ class Category(Base):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(50), unique=True, nullable=False)
+    # Slug coincide 1:1 con CategoryId del frontend (e.g. "ropa", "comida")
+    slug = Column(String(50), unique=True, nullable=True)
     description = Column(String(255), nullable=True)
     
     items = relationship("PackageItem", back_populates="category")
+
+class GarmentType(Base):
+    """Tipos de prenda: camisa, pantalon, calzado, etc.
+    Los IDs coinciden exactamente con GarmentTypeId del frontend.
+    """
+    __tablename__ = "garment_type"
+    id = Column(String(50), primary_key=True)  # e.g. "camisa", "calzado"
+    label = Column(String(100), nullable=False)
 
 class Package(Base):
     __tablename__ = "package"
@@ -57,6 +67,21 @@ class PackageItem(Base):
     
     package = relationship("Package", back_populates="items")
     category = relationship("Category", back_populates="items")
+    clothing_detail = relationship("ClothingItemDetail", back_populates="package_item", uselist=False, cascade="all, delete-orphan")
+
+class ClothingItemDetail(Base):
+    """Detalle de prenda para package_items de categoría 'ropa'.
+    Relación 1:1 con PackageItem.
+    La columna size es texto libre para soportar XS/S/M/L/XL/XXL/2XL/Única
+    y también tallas numéricas de calzado (35, 36 ... 48).
+    """
+    __tablename__ = "clothing_item_detail"
+    id = Column(Integer, primary_key=True, index=True)
+    package_item_id = Column(Integer, ForeignKey("package_item.id", ondelete="CASCADE"), nullable=False, unique=True)
+    garment_type_id = Column(String(50), ForeignKey("garment_type.id"), nullable=False)
+    size = Column(String(10), nullable=False)
+
+    package_item = relationship("PackageItem", back_populates="clothing_detail")
 
 class CampToken(Base):
     __tablename__ = "camp_token"

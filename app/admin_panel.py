@@ -2,7 +2,7 @@ from sqladmin import ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from app.core.config import settings
-from app.models.domain import Category, CampToken, Package, PackageItem, Truck, Trip, SyncLog, DeadLetterEvent
+from app.models.domain import Category, CampToken, Package, PackageItem, Truck, Trip, SyncLog, DeadLetterEvent, GarmentType, ClothingItemDetail
 
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
@@ -68,6 +68,19 @@ class PackageItemView(ModelView, model=PackageItem):
     name_plural = "Package Items"
     icon = "fa-solid fa-boxes-stacked"
 
+class GarmentTypeView(ModelView, model=GarmentType):
+    column_list = [GarmentType.id, GarmentType.label]
+    name = "Garment Type"
+    name_plural = "Garment Types"
+    icon = "fa-solid fa-shirt"
+
+class ClothingItemDetailView(ModelView, model=ClothingItemDetail):
+    column_list = [ClothingItemDetail.id, ClothingItemDetail.package_item_id, ClothingItemDetail.garment_type_id, ClothingItemDetail.size]
+    column_searchable_list = [ClothingItemDetail.garment_type_id, ClothingItemDetail.size]
+    name = "Clothing Detail"
+    name_plural = "Clothing Details"
+    icon = "fa-solid fa-tags"
+
 class SyncLogView(ModelView, model=SyncLog):
     column_list = [SyncLog.sync_id, SyncLog.event_type, SyncLog.result, SyncLog.centro_acopio_id, SyncLog.total_events, SyncLog.processed_count, SyncLog.failed_count, SyncLog.processed_at]
     column_searchable_list = [SyncLog.sync_id, SyncLog.centro_acopio_id]
@@ -86,6 +99,8 @@ class DeadLetterEventView(ModelView, model=DeadLetterEvent):
 admin_views = [
     CampTokenView,
     CategoryView,
+    GarmentTypeView,
+    ClothingItemDetailView,
     TruckView,
     TripView,
     PackageView,
