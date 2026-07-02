@@ -31,7 +31,8 @@ async def process_sync(db: AsyncSession, payload: SyncPayload) -> SyncResponse:
     if not payload.centro_acopio_id:
         raise HTTPException(status_code=403, detail="Debe proporcionar un token de centro de acopio válido.")
         
-    result_camp = await db.execute(select(CampToken).where(CampToken.token_hash == payload.centro_acopio_id))
+    normalized_token = payload.centro_acopio_id.strip().lower()
+    result_camp = await db.execute(select(CampToken).where(CampToken.token_hash == normalized_token))
     camp = result_camp.scalar_one_or_none()
     
     if not camp or not camp.is_active:

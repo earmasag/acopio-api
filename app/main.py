@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from sqladmin import Admin
-from app.api.endpoints import admin, qrcodes, sync, products
+from app.api.endpoints import admin, camps, qrcodes, sync, products
 from app.db.session import engine
 from app.admin_panel import authentication_backend, admin_views
 
@@ -12,6 +12,7 @@ for view in admin_views:
     admin_panel.add_view(view)
 
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
+app.include_router(camps.router, prefix="/api/v1/camps", tags=["camps"])
 app.include_router(qrcodes.router, prefix="/api/v1/qrcodes", tags=["qrcodes"])
 app.include_router(sync.router, prefix="/api/v1/sync", tags=["sync"])
 app.include_router(products.router, prefix="/api/v1/products", tags=["products"])

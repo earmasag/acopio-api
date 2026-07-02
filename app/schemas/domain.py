@@ -61,6 +61,7 @@ class PackageResponse(BaseModel):
 
 class CampTokenCreate(BaseModel):
     camp_name: str = Field(..., max_length=100)
+    camp_code: str = Field(..., max_length=100, description="Código legible del centro de acopio, ej. 'centro-ucab-1'")
 
 class CampTokenResponse(BaseModel):
     id: int

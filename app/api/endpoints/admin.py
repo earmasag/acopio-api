@@ -17,11 +17,13 @@ def hash_token(token: str) -> str:
 
 @router.post("/tokens", response_model=CampTokenResponse, dependencies=[Depends(verify_admin_secret)])
 async def create_token(token_in: CampTokenCreate, db: AsyncSession = Depends(get_db)):
-    raw_token = str(uuid.uuid4())
-    hashed_token = hash_token(raw_token)
+    # Verificar que no exista un token con el mismo código
+    result = await db.execute(select(CampToken).where(CampToken.token_hash == token_in.camp_code.strip().lower()))
+    if result.scalar_one_or_none():
+        raise HTTPException(status_code=409, detail=f"Ya existe un token con el código '{token_in.camp_code}'")
     
     db_token = CampToken(
-        token_hash=hashed_token,
+        token_hash=token_in.camp_code.strip().lower(),
         camp_name=token_in.camp_name,
         is_active=True
     )
@@ -30,7 +32,7 @@ async def create_token(token_in: CampTokenCreate, db: AsyncSession = Depends(get
     await db.refresh(db_token)
     
     response_data = db_token.__dict__.copy()
-    response_data["token"] = raw_token
+    response_data["token"] = db_token.token_hash
     return response_data
 
 @router.get("/tokens", response_model=List[CampTokenResponse], dependencies=[Depends(verify_admin_secret)])
